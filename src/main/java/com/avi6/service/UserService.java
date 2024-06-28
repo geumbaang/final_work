@@ -33,4 +33,9 @@ public class UserService {
 
         userRepository.save(userEntity);
     }
+
+	public UserEntity getUserByEmail(String email) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

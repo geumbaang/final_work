@@ -6,6 +6,8 @@
     <title>로그인페이지</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- 카카오 JavaScript SDK 로딩 -->
+<script src="https://developers.kakao.com/sdk/js/kakao.js"></script>   
     <style>
         /* 추가적인 스타일링 */
         .container {
@@ -41,7 +43,7 @@
     
     
     <div class="container px-5">
-            <a class="navbar-brand" th:href="@{/index}">Today Organized Plan(TOP)</a>
+            <a class="navbar-brand" href="/index">Today Organized Plan(TOP)</a>
             <div class="navbar-collapse justify-content-end">
         <div class="card">
             <div class="card-body">
@@ -61,9 +63,9 @@
                     <button id="logout-btn" class="btn btn-secondary btn-block" style="display: none;">로그아웃</button>
                 </form>
                 <!-- 에러 메시지 표시 -->
-                <div class="error-message">
-                    <span th:if="${errorMessage}" th:text="${errorMessage}"></span>
-                </div>
+            <div class="error-message" th:if="${param.error}">
+                <span>아이디와 비밀번호를 다시 확인해주세요.</span>
+            </div>
             </div>
         </div>
     </div>

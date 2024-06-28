@@ -17,16 +17,15 @@ public class MemberRepoTest {
 	   //멤버 정보 넣기
 	   @Test
 	   void insertMember() {
-	      IntStream.rangeClosed(1, 50).forEach(i ->{
+
 	         TMember tMember = TMember.builder()
-	               .email("abcd" + i +"@avi6.com")
+	               .email("penguinCold@naver.com")
 	               .password("1111")
-	               .nickname(i + "palyer")
-	               .wishList(i + "번째 멤버의 위시리스트")
+	               .nickname("김펭귄")
+	               .wishList("위시리스트")
 	               .build();
 	         
 	         tMemberRepository.save(tMember);
-	      });
 	   }
 	   
 }

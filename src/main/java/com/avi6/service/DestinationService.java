@@ -15,6 +15,7 @@ public interface DestinationService {
 	List<DestinationEntity> saveDestinations(List<DestinationDTO> destinationDTOList);
 
 	List<DestinationEntity> getDestinations(DestinationDTO destinationDTO);
+	
 
 	List<String> getNamesByLocal(List<DestinationDTO> destinationDTOList, String local);
 

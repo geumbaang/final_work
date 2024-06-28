@@ -38,15 +38,10 @@ public class TMemberServiceImpl implements TMemberService{
 		return tMemberRepository.findById(memId)
                 .orElse(null);
 	}
-	
-	
-	
-
 
 	@Override
 	public void delDest(Long memId) {
 		tMemberRepository.deleteById(memId);
-		
 	}
 
 	@Override

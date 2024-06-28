@@ -1,15 +1,7 @@
 package com.avi6.controller;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
@@ -34,6 +26,16 @@ import com.avi6.service.TBoardService;
 import lombok.RequiredArgsConstructor;
 import net.coobird.thumbnailator.Thumbnailator;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @Controller
 @RequestMapping("/")
@@ -53,7 +55,7 @@ public class TRegisterController {
 
     @GetMapping("/board")
     public String list2(TPageRequestDTO tpageRequestDTO, Model model) {
-      model.addAttribute("result", tBoardService.getList(tpageRequestDTO));
+        model.addAttribute("result", tBoardService.getList(tpageRequestDTO));
         return "board";
     }
 
@@ -64,11 +66,11 @@ public class TRegisterController {
 
     @PostMapping("/register")
     public String register(TBoardDTO tBoardDTO, @RequestParam("uploadFiles") MultipartFile[] uploadFiles, RedirectAttributes redirectAttributes) {
-        // Check if memId is null or empty
-        if (tBoardDTO.getMemId() == null) {
-            redirectAttributes.addFlashAttribute("msg", "회원 ID를 입력하세요.");
-            return "redirect:/register";
-        }
+        // mem_id를 하드코딩
+        Long memId = 8L; // mem_id가 2인 사용자
+
+        // memId를 tBoardDTO에 설정
+        tBoardDTO.setMemId(memId);
 
         // Fetch the member from the database
         TMember member = tBoardService.findMemberById(tBoardDTO.getMemId());
@@ -155,6 +157,4 @@ public class TRegisterController {
         }
         return str;
     }
-
-    
 }

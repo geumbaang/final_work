@@ -23,6 +23,7 @@ public class DestinationServiceImpl implements DestinationService {
 
     @Override
     public List<DestinationEntity> getDestinations(DestinationDTO destinationDTO) {
+    	
         return destinationRepository.findAll();
     }
 

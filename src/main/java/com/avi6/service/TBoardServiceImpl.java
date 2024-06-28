@@ -1,5 +1,22 @@
 package com.avi6.service;
 
+import com.avi6.dto.TBoardDTO;
+import com.avi6.dto.TBoardImageDTO;
+import com.avi6.dto.TPageRequestDTO;
+import com.avi6.dto.TPageResultDTO;
+import com.avi6.entity.TBoard;
+import com.avi6.entity.TBoardImage;
+import com.avi6.entity.TMember;
+import com.avi6.repository.TBoardImageRepository;
+import com.avi6.repository.TBoardRepository;
+import com.avi6.repository.TMemberRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -8,44 +25,17 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.avi6.dto.TBoardDTO;
-import com.avi6.dto.TBoardImageDTO;
-import com.avi6.dto.TPageRequestDTO;
-import com.avi6.dto.TPageResultDTO;
-import com.avi6.entity.TBoard;
-import com.avi6.entity.TBoardImage;
-import com.avi6.entity.TMember;
-import com.avi6.entity.TReply;
-import com.avi6.repository.TBoardImageRepository;
-import com.avi6.repository.TBoardRepository;
-import com.avi6.repository.TMemberRepository;
-
-import lombok.RequiredArgsConstructor;
-
 @Service
 @RequiredArgsConstructor
 public class TBoardServiceImpl implements TBoardService {
 
     private final TBoardRepository tBoardRepository;
-    
     private final TBoardImageRepository tBoardImageRepository;
-    
     private final TMemberRepository tMemberRepository;
 
     @Transactional
     @Override
     public Long register(TBoardDTO tBoardDTO) {
-        // Check if memId is null
-        if (tBoardDTO.getMemId() == null) {
-            throw new IllegalArgumentException("회원 ID를 입력하세요.");
-        }
-
         TMember member = tMemberRepository.findById(tBoardDTO.getMemId())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid member ID: " + tBoardDTO.getMemId()));
 
@@ -88,9 +78,8 @@ public class TBoardServiceImpl implements TBoardService {
             result = tBoardRepository.getListPage(pageable);
         }
 
-        return new TPageResultDTO<>(result, convertFunction); 
+        return new TPageResultDTO<>(result, convertFunction);
     }
-
 
     @Override
     public TBoardDTO getBoard(Long bno) {
@@ -119,7 +108,6 @@ public class TBoardServiceImpl implements TBoardService {
         return entityToDTO(tBoard, tBoardImages, member, visitCount, replyCount);
     }
 
-    
     // DTO를 엔티티로 변환하는 메서드
     public Map<String, Object> dtoToEntity(TBoardDTO tBoardDTO) {
         TMember member = TMember.builder()
@@ -179,49 +167,39 @@ public class TBoardServiceImpl implements TBoardService {
                 .build();
     }
 
-    
     //조회수 증가시키는 메서드
-	@Override
-	public void incrementVisitCount(Long bno) {
-		Optional<TBoard> tBoardOpt = tBoardRepository.findById(bno);
+    @Override
+    public void incrementVisitCount(Long bno) {
+        Optional<TBoard> tBoardOpt = tBoardRepository.findById(bno);
         if (tBoardOpt.isPresent()) {
             TBoard tBoard = tBoardOpt.get();
             tBoard.setVisitCount(tBoard.getVisitCount() + 1);
             tBoardRepository.save(tBoard);
         }
-	}
+    }
 
-	@Override
-	@Transactional
-	public void updateArticle(TBoardDTO tBoardDTO) {
+    @Override
+    @Transactional
+    public void updateArticle(TBoardDTO tBoardDTO) {
+        TBoard tBoard = tBoardRepository.getReferenceById(tBoardDTO.getBno());
+        tBoard.setTitle(tBoardDTO.getTitle());
+        tBoard.setContent(tBoardDTO.getContent());
+        tBoardRepository.save(tBoard);
+    }
 
-		TBoard tBoard = tBoardRepository.getReferenceById(tBoardDTO.getBno());
-		
-		tBoard.setTitle(tBoardDTO.getTitle());
-		tBoard.setContent(tBoardDTO.getContent());
-		
-		tBoardRepository.save(tBoard);
-	}
+    @Override
+    public TBoardDTO get(Long bno) {
+        System.out.println("글 상세 요청함 글 번호 --> " + bno);
+        Object obj = tBoardRepository.getBoardWithBno(bno);
+        Object[] arr = (Object[]) obj;
+        return entityToDTO((TBoard) arr[0], null, (TMember) arr[1], (Long) arr[2], (Long) arr[3]);
+    }
 
-	@Override
-	public TBoardDTO get(Long bno) {
-		System.out.println("글 상세 요청함 글 번호 --> " + bno);
-		
-		Object obj = tBoardRepository.getBoardWithBno(bno);
-		
-		Object[] arr = (Object[])obj;
-		
-		return entityToDTO((TBoard)arr[0], null, (TMember)arr[1], (Long)arr[2] ,(Long)arr[3]);
-	}
-
-	@Override
-	public void delArticle(Long bno) {
-		
-		//댓글부터 삭제
-		tBoardRepository.delByBno(bno);
-		
-		//글 삭제
-		tBoardRepository.deleteById(bno);
-	}
-
+    @Override
+    public void delArticle(Long bno) {
+        //댓글부터 삭제
+        tBoardRepository.delByBno(bno);
+        //글 삭제
+        tBoardRepository.deleteById(bno);
+    }
 }
